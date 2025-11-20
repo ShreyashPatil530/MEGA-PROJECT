@@ -11,7 +11,7 @@
 
 **A powerful full-stack MERN application for instant CSV data analysis with real-time visualizations and advanced statistics.**
 
-[Live Demo](#) • [Report Bug](https://github.com/ShreyashPatil530/A-full-stack-MERN-application-for-Data-Explorer---CSV-Analysis-Dashboard/issues) • [Request Feature](https://github.com/ShreyashPatil530/A-full-stack-MERN-application-for-Data-Explorer---CSV-Analysis-Dashboard/issues)
+[Live Demo](https://shreyash-patil-project-csv-to-insight.netlify.app/) • [Report Bug](https://github.com/ShreyashPatil530/A-full-stack-MERN-application-for-Data-Explorer---CSV-Analysis-Dashboard/issues) • [Request Feature](https://github.com/ShreyashPatil530/A-full-stack-MERN-application-for-Data-Explorer---CSV-Analysis-Dashboard/issues)
 
 </div>
 

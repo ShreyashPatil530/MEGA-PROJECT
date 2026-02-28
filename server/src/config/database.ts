@@ -17,11 +17,11 @@ export async function connectDB() {
       serverSelectionTimeoutMS: 5000,
     });
 
-    console.log('✅ MongoDB connected successfully');
-    console.log(`📊 Database: ${DB_NAME}`);
+    console.log('MongoDB connected successfully');
+    console.log(`Database: ${DB_NAME}`);
     return mongoose.connection;
   } catch (error: any) {
-    console.error('❌ MongoDB connection error:', error.message);
+    console.error('MongoDB connection error:', error.message);
     process.exit(1);
   }
 }

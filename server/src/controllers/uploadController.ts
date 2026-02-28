@@ -32,9 +32,9 @@ export async function uploadCSV(req: Request, res: Response) {
       });
 
       await analysis.save();
-      console.log('✅ Analysis saved to MongoDB');
+      console.log('Analysis saved to MongoDB');
     } catch (dbError: any) {
-      console.error('⚠️  Failed to save to MongoDB:', dbError.message);
+      console.error('Failed to save to MongoDB:', dbError.message);
       // Continue even if DB save fails
     }
 

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { UploadResponse, AnalysisHistoryItem } from '../types/index';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://mega-project-fau6.onrender.com/api';
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -14,11 +14,11 @@ export const axiosInstance: AxiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    console.log('📤 Request:', config.method?.toUpperCase(), config.url);
+    console.log('Request:', config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => {
-    console.error('❌ Request Error:', error);
+    console.error('Request Error:', error);
     return Promise.reject(error);
   }
 );
@@ -26,11 +26,11 @@ axiosInstance.interceptors.request.use(
 // Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log('📥 Response:', response.status, response.data);
+    console.log('Response:', response.status, response.data);
     return response;
   },
   (error: AxiosError) => {
-    console.error('❌ Response Error:', error.response?.status, error.message);
+    console.error('Response Error:', error.response?.status, error.message);
     return Promise.reject(error);
   }
 );

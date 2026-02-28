@@ -30,7 +30,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Connect to MongoDB
 connectDB().then(() => {
-  console.log('🗄️  Database connection established');
+  console.log('Database connection established');
 }).catch((error) => {
   console.error('Failed to connect to database:', error);
 });
@@ -54,8 +54,8 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 CSV upload endpoint: POST http://localhost:${PORT}/api/upload`);
-  console.log(`✅ CORS enabled for: ${CLIENT_URL}`);
-  console.log(`🗄️  MongoDB URI configured`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`CSV upload endpoint: POST http://localhost:${PORT}/api/upload`);
+  console.log(`CORS enabled for: ${CLIENT_URL}`);
+  console.log(`MongoDB URI configured`);
 });

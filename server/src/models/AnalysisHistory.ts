@@ -37,7 +37,6 @@ const analysisHistorySchema = new Schema<IAnalysisHistory>(
     uploadedAt: {
       type: Date,
       default: Date.now,
-      index: true,
     },
     userAgent: String,
     ipAddress: String,

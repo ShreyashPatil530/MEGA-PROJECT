@@ -55,6 +55,34 @@ export const apiService = {
     }
   },
 
+  // Clean CSV file and download
+  cleanCSV: async (file: File): Promise<Blob> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axiosInstance.post('/clean', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        responseType: 'blob',
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Generate Groq AI Report
+  generateReport: async (analysisData: any): Promise<string> => {
+    try {
+      const response = await axiosInstance.post<{ success: boolean; report: string }>('/generate-report', { analysisData });
+      return response.data.report;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   // Get analysis history
   getAnalysisHistory: async (limit: number = 10, skip: number = 0) => {
     try {

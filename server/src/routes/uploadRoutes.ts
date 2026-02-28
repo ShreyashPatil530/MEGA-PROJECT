@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { uploadCSV } from '../controllers/uploadController';
+import { cleanCSV } from '../controllers/cleanController';
 import multer from 'multer';
 import path from 'path';
 
@@ -30,5 +31,6 @@ const upload = multer({
 });
 
 router.post('/upload', upload.single('file'), uploadCSV);
+router.post('/clean', upload.single('file'), cleanCSV);
 
 export default router;

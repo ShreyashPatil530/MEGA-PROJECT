@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { apiService } from '../api/axiosConfig';
 import {
   BarChart3,
   Database,
@@ -8,6 +10,8 @@ import {
   CheckCircle,
   Rows,
   Columns,
+  Cpu,
+  Download
 } from 'lucide-react';
 import FileUpload from './FileUpload';
 import KPICard from './KPICard';
@@ -18,66 +22,95 @@ import { AnalysisResult, KPIData } from '../types/index';
 const Dashboard: React.FC = () => {
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [aiReport, setAiReport] = useState<string | null>(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
   const handleAnalysisComplete = (result: AnalysisResult) => {
     setAnalysis(result);
+    setAiReport(null);
     setIsLoading(false);
+  };
+
+  const handleGenerateReport = async () => {
+    if (!analysis) return;
+    setIsGeneratingReport(true);
+    try {
+      const report = await apiService.generateReport(analysis);
+      setAiReport(report);
+    } catch (error) {
+      console.error('Failed to generate report:', error);
+      alert('Failed to generate AI report');
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
+  const handleDownloadReport = () => {
+    if (!aiReport) return;
+    const blob = new Blob([aiReport], { type: 'text/markdown' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `AI_Report_${analysis?.fileName || 'dataset'}.md`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const kpiData: KPIData[] = analysis
     ? [
-        {
-          label: 'Total Rows',
-          value: analysis.totalRows.toLocaleString(),
-          icon: <Rows className="w-6 h-6 text-blue-600" />,
-          color: 'text-blue-600',
-        },
-        {
-          label: 'Total Columns',
-          value: analysis.totalColumns,
-          icon: <Columns className="w-6 h-6 text-green-600" />,
-          color: 'text-green-600',
-        },
-        {
-          label: 'Missing %',
-          value: analysis.missingPercentage.toFixed(2),
-          icon: <AlertCircle className="w-6 h-6 text-yellow-600" />,
-          color: 'text-yellow-600',
-          unit: '%',
-        },
-        {
-          label: 'Duplicates %',
-          value: analysis.duplicateRowsPercentage.toFixed(2),
-          icon: <AlertCircle className="w-6 h-6 text-red-600" />,
-          color: 'text-red-600',
-          unit: '%',
-        },
-        {
-          label: 'Numeric Columns',
-          value: analysis.numericColumns,
-          icon: <TrendingUp className="w-6 h-6 text-purple-600" />,
-          color: 'text-purple-600',
-        },
-        {
-          label: 'Categorical Columns',
-          value: analysis.categoricalColumns,
-          icon: <Database className="w-6 h-6 text-indigo-600" />,
-          color: 'text-indigo-600',
-        },
-        {
-          label: 'Completeness',
-          value: analysis.completenessScore.toFixed(2),
-          icon: <CheckCircle className="w-6 h-6 text-green-600" />,
-          color: 'text-green-600',
-          unit: '%',
-        },
-        {
-          label: 'Outlier Count',
-          value: analysis.outlierCount,
-          icon: <BarChart3 className="w-6 h-6 text-orange-600" />,
-          color: 'text-orange-600',
-        },
-      ]
+      {
+        label: 'Total Rows',
+        value: analysis.totalRows.toLocaleString(),
+        icon: <Rows className="w-6 h-6 text-blue-600" />,
+        color: 'text-blue-600',
+      },
+      {
+        label: 'Total Columns',
+        value: analysis.totalColumns,
+        icon: <Columns className="w-6 h-6 text-green-600" />,
+        color: 'text-green-600',
+      },
+      {
+        label: 'Missing %',
+        value: analysis.missingPercentage.toFixed(2),
+        icon: <AlertCircle className="w-6 h-6 text-yellow-600" />,
+        color: 'text-yellow-600',
+        unit: '%',
+      },
+      {
+        label: 'Duplicates %',
+        value: analysis.duplicateRowsPercentage.toFixed(2),
+        icon: <AlertCircle className="w-6 h-6 text-red-600" />,
+        color: 'text-red-600',
+        unit: '%',
+      },
+      {
+        label: 'Numeric Columns',
+        value: analysis.numericColumns,
+        icon: <TrendingUp className="w-6 h-6 text-purple-600" />,
+        color: 'text-purple-600',
+      },
+      {
+        label: 'Categorical Columns',
+        value: analysis.categoricalColumns,
+        icon: <Database className="w-6 h-6 text-indigo-600" />,
+        color: 'text-indigo-600',
+      },
+      {
+        label: 'Completeness',
+        value: analysis.completenessScore.toFixed(2),
+        icon: <CheckCircle className="w-6 h-6 text-green-600" />,
+        color: 'text-green-600',
+        unit: '%',
+      },
+      {
+        label: 'Outlier Count',
+        value: analysis.outlierCount,
+        icon: <BarChart3 className="w-6 h-6 text-orange-600" />,
+        color: 'text-orange-600',
+      },
+    ]
     : [];
 
   return (
@@ -141,6 +174,42 @@ const Dashboard: React.FC = () => {
                 </div>
               ))}
             </div>
+
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={handleGenerateReport}
+                disabled={isGeneratingReport}
+                className={`btn-primary px-8 py-3 text-lg font-semibold flex items-center gap-3 shadow-lg hover:shadow-xl transition-all ${isGeneratingReport ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
+                {isGeneratingReport ? (
+                  <div className="animate-spin text-white">⏳</div>
+                ) : (
+                  <Cpu className="w-6 h-6 text-yellow-300" />
+                )}
+                {isGeneratingReport ? 'Generating Groq AI Report...' : 'Generate Groq AI Report'}
+              </button>
+            </div>
+
+            {aiReport && (
+              <div className="mt-8 card slide-in bg-white border-2 border-blue-100">
+                <div className="flex items-center justify-between border-b pb-4 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Cpu className="w-6 h-6 text-blue-600" />
+                    AI Analysis Report
+                  </h2>
+                  <button
+                    onClick={handleDownloadReport}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download Report
+                  </button>
+                </div>
+                <div className="prose max-w-none text-gray-700">
+                  <ReactMarkdown>{aiReport}</ReactMarkdown>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import uploadRoutes from './routes/uploadRoutes';
 import historyRoutes from './routes/historyRoutes';
+import reportRoutes from './routes/reportRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { connectDB } from './config/database';
 import fs from 'fs';
@@ -24,8 +25,8 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Connect to MongoDB
 connectDB().then(() => {
@@ -37,11 +38,12 @@ connectDB().then(() => {
 // Routes
 app.use('/api', uploadRoutes);
 app.use('/api', historyRoutes);
+app.use('/api', reportRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'Backend is running', 
+  res.json({
+    status: 'Backend is running',
     timestamp: new Date(),
     database: 'connected'
   });

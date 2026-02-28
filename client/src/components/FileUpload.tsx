@@ -86,12 +86,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onAnalysisComplete, isLoading =
 
     try {
       const response = await apiService.uploadCSV(file);
-      
+
       if (response.success && response.data) {
         setSuccess(true);
         onAnalysisComplete(response.data);
         setFile(null);
-        
+
         // Reset success message after 3 seconds
         setTimeout(() => setSuccess(false), 3000);
       } else {
@@ -100,6 +100,31 @@ const FileUpload: React.FC<FileUploadProps> = ({ onAnalysisComplete, isLoading =
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error uploading file');
       console.error('Upload error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClean = async () => {
+    if (!file) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const blob = await apiService.cleanCSV(file);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cleaned_${file.name}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Error cleaning file');
+      console.error('Clean error:', err);
     } finally {
       setLoading(false);
     }
@@ -119,15 +144,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onAnalysisComplete, isLoading =
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        className={`card border-2 border-dashed transition-all duration-300 ${
-          isDragging
+        className={`card border-2 border-dashed transition-all duration-300 ${isDragging
             ? 'border-blue-500 bg-blue-50'
             : 'border-gray-300 hover:border-blue-400'
-        }`}
+          }`}
       >
         <div className="flex flex-col items-center justify-center py-12">
           <Upload className={`w-12 h-12 mb-4 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
-          
+
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             Drag & drop your CSV file
           </h3>
@@ -174,26 +198,45 @@ const FileUpload: React.FC<FileUploadProps> = ({ onAnalysisComplete, isLoading =
             </button>
           </div>
 
-          {/* Upload Button */}
-          <button
-            onClick={handleUpload}
-            disabled={loading || isLoading}
-            className={`w-full mt-4 btn-primary flex items-center justify-center gap-2 ${
-              loading || isLoading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {loading || isLoading ? (
-              <>
-                <div className="animate-spin">⏳</div>
-                Analyzing CSV...
-              </>
-            ) : (
-              <>
-                <Upload className="w-4 h-4" />
-                Upload & Analyze
-              </>
-            )}
-          </button>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <button
+              onClick={handleUpload}
+              disabled={loading || isLoading}
+              className={`flex-1 btn-primary flex items-center justify-center gap-2 ${loading || isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+            >
+              {loading || isLoading ? (
+                <>
+                  <div className="animate-spin">⏳</div>
+                  Analyzing CSV...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Upload & Analyze
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleClean}
+              disabled={loading || isLoading}
+              className={`flex-1 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 ${loading || isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+            >
+              {loading || isLoading ? (
+                <>
+                  <div className="animate-spin">⏳</div>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  Clean & Download Dataset
+                </>
+              )}
+            </button>
+          </div>
         </div>
       )}
 

@@ -40,6 +40,11 @@ app.use('/api', uploadRoutes);
 app.use('/api', historyRoutes);
 app.use('/api', reportRoutes);
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.send('Welcome to the Sales & Reviews Insights API Backend!');
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({
